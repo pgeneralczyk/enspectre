@@ -15,4 +15,5 @@ end
 
 # teraz możesz używać Query:
 puts "Hello World"
+puts "Second line"
 
