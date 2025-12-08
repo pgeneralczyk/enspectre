@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
-	"enspectre/apiclient"
+	"enspectre/service/rental/contract/itemApi"
+	"fmt"
+
+	"github.com/fatih/color"
 )
 
 type RequestBody struct {
@@ -110,10 +113,20 @@ type Product struct {
 
 func main() {
 	ctx := context.Background()
-	data, err := apiclient.Get(ctx, "rental/contracts")
+
+	item, err := itemApi.GetRentalContractItem(ctx, 100490, 45)
 	if err != nil {
+		println(color.RedString(err.Error()))
 		panic(err)
 	}
 
-	println(string(data))
+	fmt.Println("Item id:", item.RentalContractItemId)
+	fmt.Println("Line Number:", item.LineNumber)
+	fmt.Println("Initial item id:", item.InitialRentalContractItem.RentalContractItemId)
+	rarQuery := fmt.Sprintf("DOCNO==100490 && INITIALITM1REF==%d", item.InitialRentalContractItem.RentalContractItemId)
+	println((color.GreenString(rarQuery)))
+
+	rcaQuery := fmt.Sprintf("RCTNO==100490 && INITIALITM1REF==%d", item.InitialRentalContractItem.RentalContractItemId)
+	println((color.YellowString(rcaQuery)))
+
 }

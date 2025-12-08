@@ -2,14 +2,15 @@ package apiclient
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
-const bearerToken = "_AOARALZrk2e--2bxswbuw2"
+const bearerToken = "kC4XqcutLUK4vAmRBgDc3Q2"
 const baseUrl = "https://api.rambase.net/"
 const db = "TEM-NO"
 
@@ -37,9 +38,7 @@ func concatUrl(endpoint string) string {
 }
 
 func Get(ctx context.Context, endpoint string) ([]byte, error) {
-
 	url := concatUrl(endpoint)
-	fmt.Println(url)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -54,5 +53,12 @@ func Get(ctx context.Context, endpoint string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	return io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	} else if strings.Contains(string(body), "Invalid $access_token") {
+		return nil, errors.New("Invalid access token")
+	}
+
+	return body, nil
 }
